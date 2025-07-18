@@ -30,50 +30,50 @@ class Lexer:
                 tokens.append(self.__makeNumber())
             elif(self.current == '"'):
                 tokens.append(self.__MakeString())
-            elif self.current == Consts.PLUS:
+            elif self.current == Consts.PLUS_SYMBOL:
                 tokens.append(Token(Consts.PLUS))
                 self.__advance()
-            elif self.current == Consts.MINUS:
+            elif self.current == Consts.MINUS_SYMBOL:
                 tokens.append(Token(Consts.MINUS))
                 self.__advance()
-            elif self.current == Consts.MUL:
+            elif self.current == Consts.MUL_SYMBOL:
                 tokens.append(Token(Consts.MUL))
                 self.__advance()
-            elif self.current == Consts.DIV:
+            elif self.current == Consts.DIV_SYMBOL:
                 tokens.append(Token(Consts.DIV))
                 self.__advance()
-            elif self.current == Consts.POW:
+            elif self.current == Consts.POW_SYMBOL:
                 tokens.append(Token(Consts.POW))
                 self.__advance()
-            elif self.current == Consts.LPAR:
+            elif self.current == Consts.LPAR_SYMBOL:
                 tokens.append(Token(Consts.LPAR))
                 self.__advance()
-            elif self.current == Consts.RPAR:
+            elif self.current == Consts.RPAR_SYMBOL:
                 tokens.append(Token(Consts.RPAR))
                 self.__advance()
             ##################################
             elif self.current in Consts.LETRAS + Consts.UNDER:
                 tokens.append(self.__makeId())
-            elif self.current == Consts.LSQUARE:
+            elif self.current == Consts.LSQUARE_SYMBOL:
                 tokens.append(Token(Consts.LSQUARE))
                 self.__advance()
-            elif self.current == Consts.RSQUARE:
+            elif self.current == Consts.RSQUARE_SYMBOL:
                 tokens.append(Token(Consts.RSQUARE))
                 self.__advance()
-            elif self.current == Consts.COMMA:
+            elif self.current == Consts.COMMA_SYMBOL:
                 tokens.append(Token(Consts.COMMA))
                 self.__advance()
-            elif self.current == Consts.EQ:
+            elif self.current == Consts.EQ_SYMBOL:
                 tokens.append(Token(Consts.EQ))
                 self.__advance()
             ##############################
-            elif self.current == Consts.LBRACE:
+            elif self.current == Consts.LBRACE_SYMBOL:
                 tokens.append(Token(Consts.LBRACE))
                 self.__advance()
-            elif self.current == Consts.RBRACE:
+            elif self.current == Consts.RBRACE_SYMBOL:
                 tokens.append(Token(Consts.RBRACE))
                 self.__advance()
-            elif self.current == Consts.COLON:
+            elif self.current == Consts.COLON_SYMBOL:
                 tokens.append(Token(Consts.COLON))
                 self.__advance()
             else:
