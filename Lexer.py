@@ -67,6 +67,15 @@ class Lexer:
                 tokens.append(Token(Consts.EQ))
                 self.__advance()
             ##############################
+            elif self.current == Consts.LBRACE:
+                tokens.append(Token(Consts.LBRACE))
+                self.__advance()
+            elif self.current == Consts.RBRACE:
+                tokens.append(Token(Consts.RBRACE))
+                self.__advance()
+            elif self.current == Consts.COLON:
+                tokens.append(Token(Consts.COLON))
+                self.__advance()
             else:
                 self.__advance()
                 return [], Error(f"{Error.lexerError}: lex-symbol '{self.current}' fail!")

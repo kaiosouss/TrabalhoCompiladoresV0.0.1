@@ -163,3 +163,28 @@ class NoList(Visitor):
 
 	def __repr__(self):
 		return f'{self.elements}'
+	
+class NoDict(Visitor):
+    def __init__(self, pares_chave_valor):
+        self.pares = pares_chave_valor
+
+    def visit(self, operator):
+        dict_valores = {}
+        
+        for chave_node, valor_node in self.pares:
+            chave = operator.registry(chave_node.visit(operator))
+            if operator.error: return operator
+            
+            valor = operator.registry(valor_node.visit(operator))
+            if operator.error: return operator
+            
+            # Verificar se a chave é hashable
+            if not isinstance(chave, (TNumber, TString)):
+                return operator.fail(Error(f"{Error.runTimeError}: Chave do dicionário deve ser um número ou string"))
+            
+            dict_valores[chave] = valor
+        
+        return operator.success(TDict(dict_valores).setMemory(operator))
+
+    def __repr__(self):
+        return f'{{{self.pares}}}'

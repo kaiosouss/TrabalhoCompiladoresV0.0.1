@@ -42,7 +42,7 @@ class Exp(Grammar): # A variable from Grammar G
                 return self.varAssign(ast, varName)
         node = ast.registry(NoOpBinaria.Perform(Term(self.parser), (Consts.PLUS, Consts.MINUS)))
         if ast.error:
-            return ast.fail(f"{Error.parserError}: Esperado a '{Consts.INT}', '{Consts.FLOAT}', '{Consts.ID}', '{Consts.LET}', '{Consts.PLUS}', '{Consts.MINUS}', '{Consts.LPAR}'")
+            return ast.fail(f"{Error.parserError}: Esperado a '{Consts.INT}', '{Consts.FLOAT}', '{Consts.ID}', '{Consts.LET}', '{Consts.PLUS}', '{Consts.MINUS}', '{Consts.LPAR}', '{Consts.LBRACE}'")
         return ast.success(node)
 
     def varAssign(self, ast, varName):
@@ -71,11 +71,11 @@ class Pow(Grammar): # A variable from Grammar G
     def Rule(self):
         return NoOpBinaria.Perform(Atom(self.parser), (Consts.POW, ), Factor(self.parser))
     
-# Adição na classe Atom para suportar tuplas:
 class Atom(Grammar): # A variable from Grammar G
     def Rule(self):
         ast = self.GetParserManager()
         tok = self.CurrentToken()
+        
         if tok.type in (Consts.INT, Consts.FLOAT):
             self.NextToken()
             return ast.success(NoNumber(tok))
@@ -89,6 +89,11 @@ class Atom(Grammar): # A variable from Grammar G
             listExp = ast.registry(ListExp(self.parser).Rule())
             if (ast.error!=None): return ast
             return ast.success(listExp)
+        elif tok.type == Consts.LBRACE:
+            # DICIONÁRIO - movido para posição correta
+            dictExp = ast.registry(DictExp(self.parser).Rule())
+            if ast.error: return ast
+            return ast.success(dictExp)
         elif tok.type == Consts.LPAR:
             # MODIFICAÇÃO: Verificar se é tupla ou expressão entre parênteses
             self.NextToken()
@@ -128,7 +133,8 @@ class Atom(Grammar): # A variable from Grammar G
             else:
                 return ast.fail(f"{Error.parserError}: Esperando por '{Consts.RPAR}'")
             
-        return ast.fail(f"{Error.parserError}: Esperado por '{Consts.INT}', '{Consts.FLOAT}', '{Consts.PLUS}', '{Consts.MINUS}', '{Consts.LPAR}'")
+        return ast.fail(f"{Error.parserError}: Esperado por '{Consts.INT}', '{Consts.FLOAT}', '{Consts.PLUS}', '{Consts.MINUS}', '{Consts.LPAR}', '{Consts.LBRACE}'")
+
 ##############################
 class ListExp(Grammar):
     def Rule(self):
@@ -154,3 +160,51 @@ class ListExp(Grammar):
             self.NextToken()
         
         return ast.success(NoList(elementNodes))
+
+
+class DictExp(Grammar):
+    def Rule(self):
+        ast = self.GetParserManager()
+        pares_chave_valor = []
+        self.NextToken()  # Pular o '{'
+
+        if self.CurrentToken().type == Consts.RBRACE:  # Dicionário vazio
+            self.NextToken()
+        else:
+            # Parse do primeiro par chave:valor
+            chave = ast.registry(Exp(self.parser).Rule())
+            if ast.error: return ast.fail(f"{Error.parserError}: Esperando chave no dicionário")
+            
+            if self.CurrentToken().type != Consts.COLON:
+                return ast.fail(f"{Error.parserError}: Esperando ':' após chave")
+            self.NextToken()
+            
+            valor = ast.registry(Exp(self.parser).Rule())
+            if ast.error: return ast.fail(f"{Error.parserError}: Esperando valor no dicionário")
+            
+            pares_chave_valor.append((chave, valor))
+            
+            # Parse de pares adicionais
+            while self.CurrentToken().type == Consts.COMMA:
+                self.NextToken()
+                
+                if self.CurrentToken().type == Consts.RBRACE:  # Vírgula trailing
+                    break
+                
+                chave = ast.registry(Exp(self.parser).Rule())
+                if ast.error: return ast
+                
+                if self.CurrentToken().type != Consts.COLON:
+                    return ast.fail(f"{Error.parserError}: Esperando ':' após chave")
+                self.NextToken()
+                
+                valor = ast.registry(Exp(self.parser).Rule())
+                if ast.error: return ast
+                
+                pares_chave_valor.append((chave, valor))
+            
+            if self.CurrentToken().type != Consts.RBRACE:
+                return ast.fail(f"{Error.parserError}: Esperando 'chave' ou ',' no dicionário")
+            self.NextToken()
+        
+        return ast.success(NoDict(pares_chave_valor))

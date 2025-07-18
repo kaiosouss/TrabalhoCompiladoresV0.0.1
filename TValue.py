@@ -143,3 +143,58 @@ class TTupla(TValue):
 # elif self.current == Consts.COLON:
 #     tokens.append(Token(Consts.COLON))
 #     self.__advance()
+
+class TDict(TValue):
+    def __init__(self, value):
+        self.value = value if isinstance(value, dict) else {}
+        self.setMemory()
+    
+    def setMemory(self, memory=None):
+        self.memory = memory
+        return self
+    
+    def add(self, other):
+        if isinstance(other, TDict):
+            novo_dict = self.value.copy()
+            novo_dict.update(other.value)
+            return TDict(novo_dict).setMemory(self.memory), None
+        return super().add(other)
+    
+    def get_item(self, chave):
+        """Método para acessar elementos do dicionário"""
+        if chave in self.value:
+            return self.value[chave].copy(), None
+        return None, Error(f"{Error.runTimeError}: Chave '{chave}' não encontrada no dicionário")
+    
+    def set_item(self, chave, valor):
+        """Método para definir elementos do dicionário"""
+        if not isinstance(chave, (TNumber, TString)):
+            return None, Error(f"{Error.runTimeError}: Chave do dicionário deve ser um número ou string")
+        self.value[chave] = valor
+        return valor, None
+    
+    def copy(self):
+        novo_dict = {}
+        for k, v in self.value.items():
+            novo_dict[k] = v.copy()
+        copy = TDict(novo_dict)
+        copy.setMemory(self.memory)
+        return copy
+    
+    def keys(self):
+        """Retorna uma lista com todas as chaves"""
+        return TList([chave.copy() for chave in self.value.keys()]), None
+    
+    def values(self):
+        """Retorna uma lista com todos os valores"""
+        return TList([valor.copy() for valor in self.value.values()]), None
+    
+    def __repr__(self):
+        if not self.value:
+            return "{}"
+        
+        items = []
+        for chave, valor in self.value.items():
+            items.append(f"{chave}: {valor}")
+        
+        return "{" + ", ".join(items) + "}"

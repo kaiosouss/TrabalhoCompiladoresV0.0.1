@@ -24,6 +24,9 @@ class Consts:
     LSQUARE   = "[" # Left  Box brackets [
     RSQUARE   = "]" # Right Box brackets ]
     COMMA      = ","
+    LBRACE = '{'
+    RBRACE = '}'
+    COLON = ':'
 
 
     # Exemplos de Palavras reservadas
